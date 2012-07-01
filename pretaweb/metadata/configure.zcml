@@ -1,0 +1,40 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="pretaweb.metadata">
+
+  <five:registerPackage package="." initialize=".initialize" />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="pretaweb.metadata"
+      directory="profiles/default"
+      description="Installs the pretaweb.metadata package"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+  <!-- -*- extra stuff goes here -*- -->
+  <include package="archetypes.schemaextender" />
+
+  <adapter factory="pretaweb.metadata.schema.MetadataExtender"
+           provides="archetypes.schemaextender.interfaces.IOrderableSchemaExtender"
+           name="pretaweb.metadata" />
+<!--
+  <adapter
+       for="*"
+       provides="Products.Archetypes.interfaces.IFieldDefaultProvider"
+       factory=".schema.RevisitDefault"
+       name="revisitDate" />
+
+  <adapter name="revisit_date" factory=".indexing.index_revisit" />
+-->
+    <browser:page
+        name="metadata-settings"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".browser.MetadataSettingsControlPanel"
+        permission="cmf.ManagePortal"
+        />
+
+</configure>
