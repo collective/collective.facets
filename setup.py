@@ -3,9 +3,9 @@ import os
 
 version = '1.0'
 
-setup(name='pretaweb.metadata',
+setup(name='collective.facets',
       version=version,
-      description="Let's users add new metadata fields to content",
+      description="Let's users add new facets to all content",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       # Get more strings from
@@ -20,7 +20,7 @@ setup(name='pretaweb.metadata',
       url='http://svn.plone.org/svn/collective/',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['pretaweb'],
+      namespace_packages=['collective'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[

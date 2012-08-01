@@ -1,6 +1,0 @@
-<layers>
- <layer
-     name="pretaweb.metadata"
-     interface="pretaweb.metadata.interfaces.IAddOnInstalled"
-     />
-</layers>

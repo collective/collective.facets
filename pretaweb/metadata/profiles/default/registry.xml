@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<registry>
-	<records interface="pretaweb.metadata.interfaces.IFacetSettings"
-        field="facets"
-        delete="True"/>
-</registry>
-
-
