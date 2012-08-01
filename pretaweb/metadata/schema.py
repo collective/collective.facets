@@ -18,7 +18,7 @@ from archetypes.schemaextender.interfaces import ISchemaExtender, IOrderableSche
 
 from plone.registry.interfaces import IRegistry
 
-from pretaweb.metadata.interfaces import IAddOnInstalled, IMetadataSettings
+from pretaweb.metadata.interfaces import IAddOnInstalled, IFacetSettings
 
 
 from datetime import datetime, timedelta
@@ -70,12 +70,13 @@ class MetadataExtender(object):
         self.context = context
 
         registry = getUtility(IRegistry)
-        settings = registry.forInterface (IMetadataSettings)
+        settings = registry.forInterface (IFacetSettings)
 
         #fake it for now
         # for facet in settings.facetList
         self.fields = []
-        for field_name in settings.metadata:
+        for facet in settings.facets:
+            field_name = facet.name
             self.fields.append(
                 ExtensionKeywordField(field_name,
                     schemata="categorization",

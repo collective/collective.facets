@@ -4,11 +4,16 @@
 
 """
 
-import zope.interface
+from zope.interface import Interface
+
+
 from zope import schema
+from schema import implements
+from plone.registry.field import PersistentField
+from pretaweb.metadata import facetsMessageFactory as _
 
 
-class IAddOnInstalled(zope.interface.Interface):
+class IAddOnInstalled(Interface):
     """A layer specific for this add-on product.
 
     This interface is referred in browserlayers.xml.
@@ -17,19 +22,33 @@ class IAddOnInstalled(zope.interface.Interface):
     only when the add-on installer has been run.
     """
 
+class PersistentObject(PersistentField, schema.Object):
+    pass
 
 
 def contentTypesVocabulary ():
     return schema.vocabulary.SimpleVocabulary.fromValues(["apples", "oranges", "pares"])
 
+class IFacetDefinition(Interface):
+    name = schema.ASCIILine(title=_(u"Facet Name"), required=True)
+    description = schema.ASCIILine(title=_(u"Description"), required=False)
 
-class IMetadataSettings (zope.interface.Interface):
+class IFacetSettings (Interface):
 
-    metadata = schema.Set(
-            title=(u"Additional Metadata Fields"),
+    facets = schema.Tuple(
+            title=_(u'Additional Facet Fields'),
             description=(u"Names of additional keyword fields"),
-            default=set([]),
+            value_type=PersistentObject(IFacetDefinition, title=_(u"Facet Definition")),
             required=False,
-            value_type=schema.TextLine(title=u"Field Name"))
+            default=(),
+            missing_value=(),
+    )
 
 
+from z3c.form.object import registerFactoryAdapter
+
+class FacetDefinition(object):
+    implements(IFacetDefinition)
+
+
+registerFactoryAdapter(IFacetDefinition, FacetDefinition)
