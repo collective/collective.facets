@@ -98,8 +98,9 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         field = collections.setdefault(name)
         field.title = u"%s Tag" % name
         field.description = u"" + description
-        field.group = u'Text'
+        field.group = u'Metadata'
         field.sortable = True
+        field.enabled = True
         field.vocabulary = u'plone.app.vocabularies.Keywords'
         field.operations = ['plone.app.querystring.operation.selection.is']
 
