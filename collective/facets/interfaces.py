@@ -22,29 +22,17 @@ class IAddOnInstalled(Interface):
     only when the add-on installer has been run.
     """
 
-class PersistentObject(PersistentField, schema.Object):
-    pass
-
-
-def contentTypesVocabulary ():
-    return schema.vocabulary.SimpleVocabulary.fromValues(["apples", "oranges", "pares"])
 
 class IFacetDefinition(Interface):
     name = schema.ASCIILine(title=_(u"Facet Name"), required=True)
     description = schema.ASCIILine(title=_(u"Description"), required=False)
 
+
 class IFacetSettings (Interface):
-    pass
-
-
-# only used for the control panel dialog.
-class IFacetEditSettings (Interface):
-
     facets = schema.Tuple(
             title=_(u'Additional Facet Fields'),
             description=(u"Names of additional keyword fields"),
             value_type=schema.Object(IFacetDefinition, title=_(u"Facet Definition")),
-#            value_type=IFacetDefinition,
             required=False,
             default=(),
             missing_value=(),

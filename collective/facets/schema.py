@@ -1,10 +1,3 @@
-"""
-
-    Retrofit re-review dates to Archetypes schema.
-
-"""
-
-
 from zope.component import adapts, getUtility
 from zope.interface import implements
 
@@ -19,16 +12,13 @@ from archetypes.schemaextender.interfaces import ISchemaExtender, IOrderableSche
 from plone.registry.interfaces import IRegistry
 from utils import ComplexRecordsProxy
 
-from collective.facets.interfaces import IAddOnInstalled, IFacetEditSettings, IFacetDefinition
+from collective.facets.interfaces import IAddOnInstalled, IFacetSettings, IFacetDefinition
 
 
-from datetime import datetime, timedelta
 
 class ExtensionKeywordField(ExtensionField, atapi.LinesField):
     """ Retrofitted keyword field """
 
-
-    
 
 class FacetsExtender(object):
     """
@@ -49,7 +39,7 @@ class FacetsExtender(object):
         self.context = context
 
         reg = getUtility(IRegistry)
-        proxy = ComplexRecordsProxy(reg, IFacetEditSettings, prefix='collective.facets')
+        proxy = ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
 
         self.fields = []
         for facet in proxy.facets:

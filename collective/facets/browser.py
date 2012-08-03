@@ -11,7 +11,7 @@ except ImportError:
 from zope.component import adapts, getUtility
 
 from Products.CMFCore.utils import getToolByName
-from interfaces import IFacetSettings, IFacetDefinition, IFacetEditSettings
+from interfaces import IFacetSettings
 from plone.registry.interfaces import IRegistry
 from plone.registry import field, Record
 from plone.app.querystring.interfaces import IQueryField
@@ -24,38 +24,23 @@ from utils import ComplexRecordsProxy
 _ = MessageFactory('plone')
 
 class FacetEditSettings(object):
-    implements(IFacetEditSettings)
+    implements(IFacetSettings)
 
 
 class FacetSettingsEditForm (controlpanel.RegistryEditForm):
-    schema = IFacetEditSettings
+    schema = IFacetSettings
     label = u"Facets Settings"
     description = u"Manage your additional facets"
 
     def getContent(self):
-        readonly = FacetEditSettings()
         reg = getUtility(IRegistry)
-        # copy non-collection settings
-        return ComplexRecordsProxy(reg, IFacetEditSettings, prefix='collective.facets')
-        #data.facets
-        
-        #data = reg.forInterface(IFacetSettings, prefix='collective.facets')
-        #for name in data.__schema__:
-        #    setattr(readonly, name, getattr(data, name))
-        # switch out facet data for that from the registry
-        #facets = sorted(reg.collectionOfInterface(IFacetDefinition, prefix='facet').items())
-        #readonly.facets = [facet for _,facet in facets]
-        #return readonly
+        return ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
 
     def applyChanges(self, data):
         self.catalog = getToolByName(self.context, 'portal_catalog')
-
         reg = getUtility(IRegistry)
-        #facets = reg.collectionOfInterface(IFacetDefinition, prefix='facet')
-        proxy = ComplexRecordsProxy(reg, IFacetEditSettings, prefix='collective.facets')
-        facets = proxy.facets
+        proxy = ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
 
-        #TODO work out which fields to delete
         delnames = set([f.name for f in proxy.facets]).difference(set([f.name for f in data['facets']]))
         i = 0
         for facet in proxy.facets:
