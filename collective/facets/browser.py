@@ -23,9 +23,6 @@ from utils import ComplexRecordsProxy, facetId
 
 _ = MessageFactory('plone')
 
-class FacetEditSettings(object):
-    implements(IFacetSettings)
-
 
 class FacetSettingsEditForm (controlpanel.RegistryEditForm):
     schema = IFacetSettings
