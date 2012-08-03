@@ -71,15 +71,25 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
         #check it adds a field to any content
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.browser.getControl("myfacet_keywords:lines").value="myvalue"
+        self.browser.getControl(name="MyFacet_keywords:lines").value="myvalue"
         self.browser.getControl("Save")
 
         # check we can search
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.browser.getControl("Add criterion")
-        self.browser.getControl("MyFacet").select()
-        self.browser.getControl('Is').select()
-        self.browser.getControl('myvalue').select()
+        self.assertTrue('MyFacet' in self.browser.getControl(name="addindex").options)
+        #self.browser.getControl("MyFacet").select()
+        #self.browser.getControl('Is').select()
+        #self.browser.getControl('myvalue').select()
+
+        # now delete our facet
+        self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
+        self.browser.getControl(name="form.widgets.facets.0.remove").selected = True
+        self.browser.getControl('Save').click()
+
+        #check it removed the field from content
+        self.browser.open( self.collection.absolute_url()+'/edit' )
+        self.assertFalse('MyFacet' in self.browser.getControl(name="addindex").options)
+
 
 
 

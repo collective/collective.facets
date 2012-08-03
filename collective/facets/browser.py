@@ -17,7 +17,9 @@ from plone.registry import field, Record
 from plone.app.querystring.interfaces import IQueryField
 from z3c.form import form, button
 from zope.i18nmessageid import MessageFactory
+from zope import schema
 from schema import implements
+from utils import ComplexRecordsProxy
 
 _ = MessageFactory('plone')
 
@@ -34,20 +36,38 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         readonly = FacetEditSettings()
         reg = getUtility(IRegistry)
         # copy non-collection settings
-        data = reg.forInterface(IFacetSettings, prefix='collective.facets')
-        for name in data.__schema__:
-            setattr(readonly, name, getattr(data, name))
+        return ComplexRecordsProxy(reg, IFacetEditSettings, prefix='collective.facets')
+        #data.facets
+        
+        #data = reg.forInterface(IFacetSettings, prefix='collective.facets')
+        #for name in data.__schema__:
+        #    setattr(readonly, name, getattr(data, name))
         # switch out facet data for that from the registry
-        facets = sorted(reg.collectionOfInterface(IFacetDefinition, prefix='facet').items())
-        readonly.facets = [facet for _,facet in facets]
-        return readonly
+        #facets = sorted(reg.collectionOfInterface(IFacetDefinition, prefix='facet').items())
+        #readonly.facets = [facet for _,facet in facets]
+        #return readonly
 
     def applyChanges(self, data):
+        self.catalog = getToolByName(self.context, 'portal_catalog')
+
         reg = getUtility(IRegistry)
-        facets = reg.collectionOfInterface(IFacetDefinition, prefix='facet')
+        #facets = reg.collectionOfInterface(IFacetDefinition, prefix='facet')
+        proxy = ComplexRecordsProxy(reg, IFacetEditSettings, prefix='collective.facets')
+        facets = proxy.facets
+
+        #TODO work out which fields to delete
+        delnames = set([f.name for f in proxy.facets]).difference(set([f.name for f in data['facets']]))
+        i = 0
+        for facet in proxy.facets:
+            if facet.name in delnames:
+                self.removeField(facet.name)
+                del proxy.facets[i]
+            i += 1
+
+        proxy.facets = data['facets']
+
 
         #super(MetadataSettingsEditForm, self).applyChanges(data)
-        self.catalog = getToolByName(self.context, 'portal_catalog')
         indexes = self.catalog.indexes()
         indexables = []
         #metadata = data['facets'] if data['facets'] else []
@@ -62,22 +82,6 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             #logger.info("Indexing new indexes %s.", ', '.join(indexables))
             self.catalog.manage_reindexIndex(ids=indexables)
 
-        # remove indexes for unused fields
-
-        #finally set the data in the registry
-        i = 0
-        for facet in data['facets']:
-            facets['facet'+str(i)] = facet
-            i += 1
-
-        # remove any remaining fields
-        for i in range(len(facets)-1,len(data['facets'])-1,-1):
-            facet = facets['facet'+str(i)]
-            name = facet.name
-            if type(name) == type(u''):
-                name = name.encode('utf-8')
-            self.removeField(name)
-            del facets['facet'+str(i)]
 
 
 #    def updateFields(self):

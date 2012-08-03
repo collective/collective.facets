@@ -43,7 +43,8 @@ class IFacetEditSettings (Interface):
     facets = schema.Tuple(
             title=_(u'Additional Facet Fields'),
             description=(u"Names of additional keyword fields"),
-            value_type=PersistentObject(IFacetDefinition, title=_(u"Facet Definition")),
+            value_type=schema.Object(IFacetDefinition, title=_(u"Facet Definition")),
+#            value_type=IFacetDefinition,
             required=False,
             default=(),
             missing_value=(),

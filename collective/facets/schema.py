@@ -17,8 +17,9 @@ from archetypes.schemaextender.field import ExtensionField
 from archetypes.schemaextender.interfaces import ISchemaExtender, IOrderableSchemaExtender, IBrowserLayerAwareExtender
 
 from plone.registry.interfaces import IRegistry
+from utils import ComplexRecordsProxy
 
-from collective.facets.interfaces import IAddOnInstalled, IFacetSettings, IFacetDefinition
+from collective.facets.interfaces import IAddOnInstalled, IFacetEditSettings, IFacetDefinition
 
 
 from datetime import datetime, timedelta
@@ -48,13 +49,10 @@ class FacetsExtender(object):
         self.context = context
 
         reg = getUtility(IRegistry)
-        settings = reg.forInterface (IFacetSettings)
-        facets = reg.collectionOfInterface(IFacetDefinition, prefix='facet')
+        proxy = ComplexRecordsProxy(reg, IFacetEditSettings, prefix='collective.facets')
 
-        #fake it for now
-        # for facet in settings.facetList
         self.fields = []
-        for facet in facets.values():
+        for facet in proxy.facets:
             field_name = facet.name
             self.fields.append(
                 ExtensionKeywordField(field_name,
