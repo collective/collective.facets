@@ -23,19 +23,19 @@ class IAddOnInstalled(Interface):
     """
 
 
-    class IFacetDefinition(Interface):
-        name = schema.ASCIILine(title=_(u"Facet Name"), required=True)
-        description = schema.ASCIILine(title=_(u"Description"), required=False)
+class IFacetDefinition(Interface):
+    name = schema.ASCIILine(title=_(u"Facet Name"), required=True)
+    description = schema.ASCIILine(title=_(u"Description"), required=False)
 
 
-    class IFacetSettings (Interface):
-        facets = schema.Tuple(
-                title=_(u'Additional Facet Fields'),
-                description=(u"Names of additional keyword fields"),
-                value_type=schema.Object(IFacetDefinition, title=_(u"Facet Definition")),
-                required=False,
-                default=(),
-                missing_value=(),
+class IFacetSettings (Interface):
+    facets = schema.Tuple(
+            title=_(u'Additional Facet Fields'),
+            description=(u"Names of additional keyword fields"),
+            value_type=schema.Object(IFacetDefinition, title=_(u"Facet Definition")),
+            required=False,
+            default=(),
+            missing_value=(),
     )
 
 
