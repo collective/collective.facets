@@ -81,6 +81,10 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         #self.browser.getControl('Is').select()
         #self.browser.getControl('myvalue').select()
 
+        # check we can show as metadata
+        self.assertTrue('facet_MyFacet' in self.browser.getControl(name="customViewFields_options").options)
+
+
         # now delete our facet
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
         self.browser.getControl(name="form.widgets.facets.0.remove").selected = True

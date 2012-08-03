@@ -14,7 +14,7 @@ A site administrator can:
 
  - Add a new facet
  - Remove a facet
- - Rename a facet #TODO
+ - Rename a facet (#TODO)
  - Edit the description and label which will appear on /edit and also on collections
  - Make a facet required (#TODO)
  - Make a facet have an enforced vocabulary, perhaps via ATVocabularyManager (#TODO)

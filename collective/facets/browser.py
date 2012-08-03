@@ -21,13 +21,13 @@ from zope import schema
 from schema import implements
 from utils import ComplexRecordsProxy, facetId
 
-_ = MessageFactory('plone')
+_ = MessageFactory('collective.facets')
 
 
 class FacetSettingsEditForm (controlpanel.RegistryEditForm):
     schema = IFacetSettings
     label = u"Facets Settings"
-    description = u"Manage your additional facets"
+    description = u"Manage your additional facets. For adding field to specifc types, use the Dexterity plugin"
 
     def getContent(self):
         reg = getUtility(IRegistry)
@@ -75,6 +75,8 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         "add index, collection field etc"
 
         id = facetId(facet.name)
+
+        # new collections
         collections = self.getCollectionMap()
         field = collections.setdefault(id)
         field.title = u"%s" % facet.name
@@ -85,6 +87,16 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         field.vocabulary = u'plone.app.vocabularies.Keywords'
         field.operations = ['plone.app.querystring.operation.selection.is']
 
+        # old collections
+        atct = getToolByName(self.context, 'portal_atct')
+        atct.addIndex(id, facet.name, facet.description, enabled=True)
+        atct.addMetadata(id, facet.name, facet.description, enabled=True)
+
+        # catalog metadata
+        if id not in self.catalog.schema():
+            self.catalog.manage_addColumn(id)
+
+        # catalog indexes
         if id not in self.catalog.indexes():
             self.catalog.addIndex(id, 'KeywordIndex')
             return [id]
@@ -92,12 +104,21 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             return []
 
     def removeField(self, facet):
-        collections = self.getCollectionMap()
         id = facetId(facet.name)
+
+        collections = self.getCollectionMap()
         if id in collections:
             del collections[id]
+
+        # old collections
+        atct = getToolByName(self.context, 'portal_atct')
+        atct.removeIndex(id)
+        atct.removeMetadata(id)
+
         if id in self.catalog.indexes():
             self.catalog.delIndex(id)
+        if id in self.catalog.schema():
+            self.catalog.manage_delColumn(id)
 
     def getCollectionMap(self):
         reg = getUtility(IRegistry)

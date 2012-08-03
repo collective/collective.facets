@@ -25,7 +25,8 @@ setup(name='collective.facets',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'archetypes.schemaextender'
+          'archetypes.schemaextender',
+          'plone.app.registry'
           # -*- Extra requirements: -*-
       ],
       entry_points="""
