@@ -65,18 +65,18 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
         # add a facet 
         self.browser.getControl("Add").click()
-        self.browser.getControl(name='form.widgets.facets.0.widgets.name').value="MyFacet"
+        self.browser.getControl(name='form.widgets.facets.0.widgets.name').value="My Facet"
         self.browser.getControl(name='form.widgets.facets.0.widgets.description').value="My Description"
         self.browser.getControl('Save').click()
 
         #check it adds a field to any content
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.browser.getControl(name="MyFacet_keywords:lines").value="myvalue"
+        self.browser.getControl(name="facet_MyFacet_keywords:lines").value="myvalue"
         self.browser.getControl("Save")
 
         # check we can search
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.assertTrue('MyFacet' in self.browser.getControl(name="addindex").options)
+        self.assertTrue('facet_MyFacet' in self.browser.getControl(name="addindex").options)
         #self.browser.getControl("MyFacet").select()
         #self.browser.getControl('Is').select()
         #self.browser.getControl('myvalue').select()

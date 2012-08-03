@@ -5,11 +5,12 @@ from plone.registry.interfaces import IRecordsProxy
 from plone.registry.recordsproxy import RecordsProxy, RecordsProxyCollection
 from userlist import ListMixin
 from zope import schema
-
-from UserDict import DictMixin
 import re
 
 _marker = object()
+
+def facetId(name):
+    return "facet_" + re.sub("\W","", name)
 
 class ComplexRecordsProxy(RecordsProxy):
     """A proxy that maps an interface to a number of records, including collections of complex records
@@ -95,53 +96,4 @@ class RecordsProxyList(ListMixin):
     def genKey(self, index):
         index_prefix = "i"
         return "%s%05d" %(index_prefix, index)
-
-#
-#    def insert(self, index, value):
-#        #move everything along one
-#        for i in range(len(self.map)-1, index, -1):
-#            newkey = self.genKey(i+1)
-#            oldkey = self.genKey(i)
-#            self.map[newkey] = self.map[oldkey]
-#        self.map[self.genKey(index)] = value
-#        self.data[index] = value
-#
-#
-#
-#    def __delitem__(self, index):
-#        for i in range(index, len(self.map), 1):
-#            oldkey = self.genKey(i+1)
-#            newkey = self.genKey(i)
-#            self.map[newkey] = self.map[oldkey]
-#        del self.data[index]
-#
-##    def append(self, item):
-##        key = self.genKey(len(self.map))
-##        self.data.append(item)
-##        self.map[key] = item
-#
-#    def append(self, x):
-#        self[len(self):len(sself)] = [x]
-#
-#    def extend(self, x):
-#        self[len(self):len(self)] = x
-#
-#    def pop(self, i):
-#        x = self[i]; del self[i]; return x
-#
-#    def remove(self, x):
-#        del self[self.index(x)]
-#
-#    def reverse(self):
-#        raise NotImplemented()
-#
-#    def sort(self, cmp, key=None, reverse=False):
-#        raise NotImplemented()
-#
-#    def __getslice__(self, i, j):
-#        return self.__getitem__(slice(i, j))
-#    def __setslice__(self, i, j, seq):
-#        return self.__setitem__(slice(i, j), seq)
-#    def __delslice__(self, i, j):
-#        return self.__delitem__(slice(i, j))
 

@@ -10,7 +10,7 @@ from archetypes.schemaextender.field import ExtensionField
 from archetypes.schemaextender.interfaces import ISchemaExtender, IOrderableSchemaExtender, IBrowserLayerAwareExtender
 
 from plone.registry.interfaces import IRegistry
-from utils import ComplexRecordsProxy
+from utils import ComplexRecordsProxy, facetId
 
 from collective.facets.interfaces import IAddOnInstalled, IFacetSettings, IFacetDefinition
 
@@ -43,7 +43,7 @@ class FacetsExtender(object):
 
         self.fields = []
         for facet in proxy.facets:
-            field_name = facet.name
+            field_name = facetId(facet.name)
             self.fields.append(
                 ExtensionKeywordField(field_name,
                     schemata="categorization",
