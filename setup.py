@@ -6,7 +6,7 @@ version = '1.0'
 setup(name='collective.facets',
       version=version,
       description="Let's users add new facets to all content",
-      long_description=open("README.txt").read() + "\n" +
+      long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
