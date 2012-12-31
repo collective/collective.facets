@@ -14,7 +14,12 @@ from Products.CMFCore.utils import getToolByName
 from interfaces import IFacetSettings
 from plone.registry.interfaces import IRegistry
 from plone.registry import field, Record
-from plone.app.querystring.interfaces import IQueryField
+
+try:
+    from plone.app.querystring.interfaces import IQueryField
+except ImportError:
+    IQueryField = None
+
 from z3c.form import form, button
 from zope.i18nmessageid import MessageFactory
 from zope import schema
@@ -78,14 +83,15 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
 
         # new collections
         collections = self.getCollectionMap()
-        field = collections.setdefault(id)
-        field.title = u"%s" % facet.name
-        field.description = u"" + facet.description
-        field.group = u'Metadata'
-        field.sortable = True
-        field.enabled = True
-        field.vocabulary = u'plone.app.vocabularies.Keywords'
-        field.operations = ['plone.app.querystring.operation.selection.is']
+        if collections:
+            field = collections.setdefault(id)
+            field.title = u"%s" % facet.name
+            field.description = u"" + facet.description
+            field.group = u'Metadata'
+            field.sortable = True
+            field.enabled = True
+            field.vocabulary = u'plone.app.vocabularies.Keywords'
+            field.operations = ['plone.app.querystring.operation.selection.is']
 
         # old collections
         atct = getToolByName(self.context, 'portal_atct')
@@ -107,7 +113,7 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         id = facetId(facet.name)
 
         collections = self.getCollectionMap()
-        if id in collections:
+        if collections and id in collections:
             del collections[id]
 
         # old collections
@@ -121,6 +127,10 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             self.catalog.manage_delColumn(id)
 
     def getCollectionMap(self):
+        if not IQueryField:
+            # IQueryField only available after Plone 4.2
+            return None
+
         reg = getUtility(IRegistry)
         fields = reg.collectionOfInterface(IQueryField, prefix='plone.app.querystring.field')
         # need to override prefix as default is field/
