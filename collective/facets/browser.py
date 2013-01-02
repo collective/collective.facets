@@ -29,55 +29,60 @@ from utils import ComplexRecordsProxy, facetId
 _ = MessageFactory('collective.facets')
 
 
+def getRegistryFacets():
+    reg = getUtility(IRegistry)
+    proxy = ComplexRecordsProxy(reg, IFacetSettings,
+                                prefix='collective.facets',
+                                key_names={'facets': 'name'})
+    return proxy
+
+
 class FacetSettingsEditForm (controlpanel.RegistryEditForm):
     schema = IFacetSettings
     label = u"Facets Settings"
-    description = u"Manage your additional facets. For adding field to specifc types, use the Dexterity plugin"
+    description = u"Manage your additional facets. For adding field to " \
+                  u"specifc types, use the Dexterity plugin"
 
     def getContent(self):
-        reg = getUtility(IRegistry)
-        return ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
+        return getRegistryFacets()
 
     def applyChanges(self, data):
         self.catalog = getToolByName(self.context, 'portal_catalog')
-        reg = getUtility(IRegistry)
-        proxy = ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
-        cur_ids = set([f.name for f in proxy.facets])
-        new_ids = set([f.name for f in data['facets']])
+        proxy = getRegistryFacets()
+        cur_ids = set([facet.name for facet in proxy.facets])
+        new_ids = set([facet.name for facet in data['facets']])
 
         delnames = cur_ids.difference(new_ids)
-        i = 0
-        for facet in proxy.facets:
-            if facet.name in delnames:
-                self.removeField(facet)
-                del proxy.facets[i]
-            i += 1
+
+        for name in delnames:
+            i = 0
+            for facet in proxy.facets:
+                if facet.name is name:
+                    self.removeField(facet)
+                    del proxy.facets[i]
+                    break
+                i += 1
+
+        #i = 0
+        #for facet in proxy.facets:
+        #    if facet.name in delnames:
+        #        self.removeField(facet)
+        #        del proxy.facets[i]
+        #    i += 1
 
         proxy.facets = data['facets']
 
-        indexes = self.catalog.indexes()
+        #indexes = self.catalog.indexes()
         indexables = []
         for facet in data['facets']:
-            indexables.extend(self.addfield(facet))
+            indexables.extend(self.addField(facet))
                 #logger.info("Added %s for field %s.", 'KeywordIndex', name)
         if len(indexables) > 0:
             #logger.info("Indexing new indexes %s.", ', '.join(indexables))
             self.catalog.manage_reindexIndex(ids=indexables)
 
-
-#    def updateFields(self):
-#        super(MetadataSettingsEditForm, self).updateFields()
-#        #self.fields['metadata'].widgetFactory = TextLinesFieldWidget
-#
-#
-#    def updateWidgets(self):
-#        super(MetadataSettingsEditForm, self).updateWidgets()
-#        #self.widgets['metadata'].rows = 4
-#        #self.widgets['metadata'].style = u'width: 30%;'
-
-
-    def addfield(self, facet):
-        "add index, collection field etc"
+    def addField(self, facet):
+        """add index, collection field etc"""
 
         id = facetId(facet.name)
 
@@ -132,14 +137,12 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             return None
 
         reg = getUtility(IRegistry)
-        fields = reg.collectionOfInterface(IQueryField, prefix='plone.app.querystring.field')
+        fields = reg.collectionOfInterface(IQueryField,
+                                           prefix='plone.app.querystring.field')
         # need to override prefix as default is field/
-        fields.prefix='plone.app.querystring.field.'
+        fields.prefix = 'plone.app.querystring.field.'
         return fields
-
 
 
 class FacetsSettingsControlPanel(controlpanel.ControlPanelFormWrapper):
     form = FacetSettingsEditForm
-
-

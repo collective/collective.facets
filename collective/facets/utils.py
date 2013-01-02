@@ -154,4 +154,7 @@ class RecordsProxyList(ListMixin):
             index_prefix = "i"
             return "%s%05d" % (index_prefix, index)
         else:
-            return self.keys.value[index]
+            if index < len(self.keys.value):
+                return self.keys.value[index]
+                # this could happen during registering menu items, not sure why
+            raise StopIteration

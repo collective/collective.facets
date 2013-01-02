@@ -11,6 +11,7 @@ from archetypes.schemaextender.interfaces import ISchemaExtender, IOrderableSche
 
 from plone.registry.interfaces import IRegistry
 from utils import ComplexRecordsProxy, facetId
+from browser import getRegistryFacets
 
 from collective.facets.interfaces import IAddOnInstalled, IFacetSettings, IFacetDefinition
 
@@ -38,8 +39,9 @@ class FacetsExtender(object):
     def __init__(self, context):
         self.context = context
 
-        reg = getUtility(IRegistry)
-        proxy = ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
+        #reg = getUtility(IRegistry)
+        #proxy = ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
+        proxy = getRegistryFacets()
 
         self.fields = []
         for facet in proxy.facets:
