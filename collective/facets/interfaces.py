@@ -27,8 +27,10 @@ class IAddOnInstalled(Interface):
 class IFacetDefinition(Interface):
     name = schema.ASCIILine(title=_(u"Facet Name"), required=True)
     description = schema.ASCIILine(title=_(u"Description"), required=False)
-#    is_vocabulary = schema.Bool(title=u'Is vocabulary?', default=False,
-#                                required=True)
+    vocabularies = schema.Choice(
+            title=_(u"Vocabulary"),
+            description=_(u"Vocabulary to use to render facet items"),
+            vocabulary="collective.facets.vocabularies.PortalVocabularies")
 
 
 class IFacetSettings (Interface):

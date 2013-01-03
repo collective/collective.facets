@@ -1,70 +1,100 @@
-from zope.component import adapts, getUtility
+from zope.component import adapts
 from zope.interface import implements
 
-from Products.Archetypes.public import BooleanWidget, KeywordWidget
-from Products.ATContentTypes.interface import IATDocument
+from Products.Archetypes.public import KeywordWidget, MultiSelectionWidget
 from Products.Archetypes import public as atapi
 from Products.Archetypes.interfaces import IBaseContent
 
 from archetypes.schemaextender.field import ExtensionField
-from archetypes.schemaextender.interfaces import ISchemaExtender, IOrderableSchemaExtender, IBrowserLayerAwareExtender
+from archetypes.schemaextender.interfaces import IOrderableSchemaExtender, \
+    IBrowserLayerAwareExtender
 
-from plone.registry.interfaces import IRegistry
-from utils import ComplexRecordsProxy, facetId
+from utils import facetId
 from browser import getRegistryFacets
 
-from collective.facets.interfaces import IAddOnInstalled, IFacetSettings, IFacetDefinition
-
+from collective.facets.interfaces import IAddOnInstalled
+from Products.CMFCore.utils import getToolByName
+from zope.schema.interfaces import IVocabularyFactory
+from zope.component import queryUtility
 
 
 class ExtensionKeywordField(ExtensionField, atapi.LinesField):
     """ Retrofitted keyword field """
 
+    def Vocabulary(self, content_instance=None):
+        vocab_name = self.vocabulary
+
+        pv = getToolByName(content_instance, 'portal_vocabularies', None)
+        vocab = getattr(pv, vocab_name, None)
+        if vocab:
+            return vocab.getDisplayList(vocab)
+
+        # refer to eea.facetednavigation.widgets.widget portal_vocabulary()
+        voc = queryUtility(IVocabularyFactory, vocab_name, None)
+        if voc:
+            return atapi.DisplayList([(term.value,
+                                       (term.title or term.token or term.value))
+                                      for term in voc(content_instance)])
+        return atapi.DisplayList()
+
 
 class FacetsExtender(object):
-    """
-    Add a series of "facets" or categorisation fields to a type
-    """
-    
-    # This extender will apply to all Archetypes based content 
+    """Add a series of "facets" or categorisation fields to a type"""
     adapts(IBaseContent)
-    
-    # We use both orderable and browser layer aware sensitive properties
+    # This extender will apply to all Archetypes based content
+
     implements(IOrderableSchemaExtender, IBrowserLayerAwareExtender)
-    
-    # Don't do schema extending unless our add-on product is installed on Plone site
+    # We use both orderable and browser layer aware sensitive properties
+
+    # Don't do schema extending unless our add-on product is installed on
+    # Plone site
     layer = IAddOnInstalled
 
+    #NOTE: These methods are called quite frequently, so it pays to optimise
+    #them. # https://osha.europa.eu/
+    # https://code.gocept.com/svn/osha/OSHA/trunk/adapter/oshcontent.py
 
     def __init__(self, context):
         self.context = context
 
-        #reg = getUtility(IRegistry)
-        #proxy = ComplexRecordsProxy(reg, IFacetSettings, prefix='collective.facets')
         proxy = getRegistryFacets()
 
         self.fields = []
         for facet in proxy.facets:
             field_name = facetId(facet.name)
-            self.fields.append(
-                ExtensionKeywordField(field_name,
-                    schemata="categorization",
-                    multiValued=1,
-                    accessor=field_name,
-                    searchable=True,
-                    widget=KeywordWidget(
-                        label=field_name,
-                        description=facet.description,
-                        ),
+            vocabularies = facet.vocabularies
+
+            if vocabularies:
+                #import ipdb; ipdb.set_trace()
+                #display_list = atapi.DisplayList(
+                #    [(x, x) for x in ['this', 'is', 'a', 'dummy',
+                #                      'vocabulary']])
+                self.fields.append(
+                    ExtensionKeywordField(field_name,
+                                          schemata="categorization",
+                                          multiValued=1,
+                                          accessor=field_name,
+                                          searchable=True,
+                                          widget=MultiSelectionWidget(
+                                              label=field_name,
+                                              description=facet.description),
+                                          vocabulary=vocabularies)
                 )
-            )
- 
+            else:
+                self.fields.append(
+                    ExtensionKeywordField(field_name,
+                                          schemata="categorization",
+                                          multiValued=1,
+                                          accessor=field_name,
+                                          searchable=True,
+                                          widget=KeywordWidget(
+                                              label=field_name,
+                                              description=facet.description))
+                )
 
         # build up our fields list from the registery settings
-
         #self.defaultRereviewDaysWait = settings.defaultRereviewDaysWait
         #self.defaultApplyToContent = settings.defaultApplyToContent
-
 
     def getOrder(self, schematas):
         """ Manipulate the order in which fields appear.
@@ -83,8 +113,5 @@ class FacetsExtender(object):
         return schematas
 
     def getFields(self):
-        """
-        @return: List of new fields we contribute to content. 
-        """
+        """@return: List of new fields we contribute to content."""
         return self.fields
-    
