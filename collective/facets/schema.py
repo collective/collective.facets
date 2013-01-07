@@ -1,7 +1,7 @@
 from zope.component import adapts
 from zope.interface import implements
 
-from Products.Archetypes.public import KeywordWidget, MultiSelectionWidget
+from Products.Archetypes.public import KeywordWidget, InAndOutWidget
 from Products.Archetypes import public as atapi
 from Products.Archetypes.interfaces import IBaseContent
 
@@ -75,7 +75,7 @@ class FacetsExtender(object):
                                           multiValued=1,
                                           accessor=field_name,
                                           searchable=True,
-                                          widget=MultiSelectionWidget(
+                                          widget=InAndOutWidget(
                                               label=facet.display_title,
                                               description=facet.description),
                                           vocabulary=vocabularies)
