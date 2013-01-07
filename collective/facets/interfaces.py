@@ -9,7 +9,7 @@ from zope.interface import Interface
 
 from zope import schema
 from schema import implements
-from plone.registry.field import PersistentField
+from validation import validate_id
 from collective.facets import facetsMessageFactory as _
 
 
@@ -25,7 +25,15 @@ class IAddOnInstalled(Interface):
 
 
 class IFacetDefinition(Interface):
-    name = schema.ASCIILine(title=_(u"Facet Name"), required=True)
+    name = schema.ASCIILine(title=_(u"Facet Name"), required=True,
+                            description=_(u"Unique name. "
+                                          u"It must contains only alphanumeric "
+                                          u"or underscore, starting with "
+                                          u"alpha"),
+                            constraint=validate_id)
+    display_title = schema.ASCIILine(title=_(u"Title"), required=True,
+                                     description=_(u"Display title as it will "
+                                                   u"appear as field title."))
     description = schema.ASCIILine(title=_(u"Description"), required=False)
     vocabularies = schema.Choice(
             title=_(u"Vocabulary"),

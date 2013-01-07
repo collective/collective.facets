@@ -76,7 +76,7 @@ class FacetsExtender(object):
                                           accessor=field_name,
                                           searchable=True,
                                           widget=MultiSelectionWidget(
-                                              label=field_name,
+                                              label=facet.display_title,
                                               description=facet.description),
                                           vocabulary=vocabularies)
                 )
@@ -88,7 +88,7 @@ class FacetsExtender(object):
                                           accessor=field_name,
                                           searchable=True,
                                           widget=KeywordWidget(
-                                              label=field_name,
+                                              label=facet.display_title,
                                               description=facet.description))
                 )
 

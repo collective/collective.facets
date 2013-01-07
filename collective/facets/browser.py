@@ -283,9 +283,9 @@ class FieldSwitcher(BrowserView):
         #portal_languages = getToolByName(context, 'portal_languages', None)
         portal_vocabularies = getToolByName(context, ATVOCABULARYTOOL, None)
         language_vocabulary = getattr(portal_vocabularies,
-                                      'languagevocabulary', None)
+                                      'mhcslanguagevocabulary', None)
         from_field = 'language'
-        to_field = 'facet_language'
+        to_field = 'facet_mhcs_language'
         error_path = []
         if not from_field or not to_field:
             return "Not valid input"
