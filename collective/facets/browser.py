@@ -292,7 +292,6 @@ class FieldSwitcher(BrowserView):
 
         context_type = 'File'
 
-        #import ipdb; ipdb.set_trace()
         path = context.getPhysicalPath()
         path = '/'.join(path)
 
@@ -320,6 +319,7 @@ class FieldSwitcher(BrowserView):
             print "to: %s" % to_type
 
             if from_field == 'language':
+                from_attribute = from_attribute.lower()
                 if from_attribute in DOC_LANG:
                     from_attribute = DOC_LANG[from_attribute]
                     language_name = DOC_LANG_NAME[from_attribute]
@@ -332,8 +332,19 @@ class FieldSwitcher(BrowserView):
                     language_vocabulary.addTerm(from_attribute, language_name,
                                                 silentignore=True)
                 else:
-                    error_path.append('/'.join(brain_context.getPhysicalPath()))
-                    continue
+                    path = brain_context.getPhysicalPath()
+                    language_from_filename = path[-1][:-4].split('-')[-1]
+                    if language_from_filename in DOC_LANG_NAME:
+                        from_attribute = language_from_filename.lower()
+                        language_name = DOC_LANG_NAME[language_from_filename]
+                        print "Language: %s %s" % (from_attribute,
+                                                   language_name)
+                        language_vocabulary.addTerm(from_attribute,
+                                                    language_name,
+                                                    silentignore=True)
+                    else:
+                        error_path.append('/'.join(brain_context.getPhysicalPath()))
+                        continue
 
             # do the task
             if from_type != to_type:
