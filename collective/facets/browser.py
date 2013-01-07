@@ -23,8 +23,11 @@ except ImportError:
 from zope.i18nmessageid import MessageFactory
 from utils import ComplexRecordsProxy, facetId
 from Acquisition import aq_inner
-from Products.ATVocabularyManager.config import TOOL_NAME as ATVOCABULARYTOOL
 
+try:
+    from Products.ATVocabularyManager.config import TOOL_NAME as ATVOCABULARYTOOL
+except ImportError:
+    ATVOCABULARYTOOL = 'portal_vocabularies'
 
 _ = MessageFactory('collective.facets')
 
@@ -282,8 +285,12 @@ class FieldSwitcher(BrowserView):
         context = aq_inner(self.context)
         #portal_languages = getToolByName(context, 'portal_languages', None)
         portal_vocabularies = getToolByName(context, ATVOCABULARYTOOL, None)
-        language_vocabulary = getattr(portal_vocabularies,
-                                      'mhcslanguagevocabulary', None)
+        if portal_vocabularies:
+            language_vocabulary = getattr(portal_vocabularies,
+                                          'mhcslanguagevocabulary', None)
+        else:
+            language_vocabulary = None
+
         from_field = 'language'
         to_field = 'facet_mhcs_language'
         error_path = []
@@ -318,7 +325,7 @@ class FieldSwitcher(BrowserView):
             print "from: %s" % from_type
             print "to: %s" % to_type
 
-            if from_field == 'language':
+            if from_field == 'language' and language_vocabulary:
                 from_attribute = from_attribute.lower()
                 if from_attribute in DOC_LANG:
                     from_attribute = DOC_LANG[from_attribute]
