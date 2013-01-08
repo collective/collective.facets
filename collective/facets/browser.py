@@ -341,6 +341,7 @@ class FieldSwitcher(BrowserView):
                 else:
                     path = brain_context.getPhysicalPath()
                     language_from_filename = path[-1][:-4].split('-')[-1]
+                    language_from_filename = language_from_filename.upper()
                     if language_from_filename in DOC_LANG_NAME:
                         from_attribute = language_from_filename.lower()
                         language_name = DOC_LANG_NAME[language_from_filename]
