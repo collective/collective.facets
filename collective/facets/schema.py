@@ -16,6 +16,7 @@ from collective.facets.interfaces import IAddOnInstalled
 from Products.CMFCore.utils import getToolByName
 from zope.schema.interfaces import IVocabularyFactory
 from zope.component import queryUtility
+from zope.component.interfaces import ComponentLookupError
 
 
 class ExtensionKeywordField(ExtensionField, atapi.LinesField):
@@ -57,7 +58,11 @@ class FacetsExtender(object):
     def __init__(self, context):
         self.context = context
 
-        proxy = getRegistryFacets()
+        try:
+            proxy = getRegistryFacets()
+        except ComponentLookupError:
+            # not installed
+            return
 
         self.fields = []
         for facet in proxy.facets:
