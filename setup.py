@@ -29,6 +29,7 @@ setup(name='collective.facets',
           'plone.app.registry'
           # -*- Extra requirements: -*-
       ],
+      extras_require={'test': ['plone.app.testing']},
       entry_points="""
       # -*- Entry points: -*-
 

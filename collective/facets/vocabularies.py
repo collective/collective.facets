@@ -1,13 +1,15 @@
 """ Portal tools specific vocabularies
 """
 import operator
-from eea.faceted.vocabularies.utils import compare
 from zope.component import getUtilitiesFor
 from zope.interface import implements
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.schema.vocabulary import SimpleTerm
 from Products.CMFCore.utils import getToolByName
-from zope.app.component.hooks import getSite
+try:
+    from zope.app.component.hooks import getSite
+except:
+    from zope.component.hooks import getSite
 #from z3c.form.interfaces import NO_VALUE
 
 try:
@@ -18,6 +20,16 @@ except ImportError:
     # < Zope 2.10
     from zope.app.schema import vocabulary
     IVocabularyFactory = vocabulary.IVocabularyFactory
+
+# from eea.faceted.vocabularies.utils import compare
+def compare(a, b):
+    """ Compare lower values """
+    if not isinstance(a, unicode):
+        a = a.decode('utf-8')
+    if not isinstance(b, unicode):
+        b = b.decode('utf-8')
+    return cmp(a.lower(), b.lower())
+
 
 #
 # portal_vocabularies
