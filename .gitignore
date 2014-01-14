@@ -3,3 +3,4 @@
 parts
 var
 bin
+.installed.cfg
