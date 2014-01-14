@@ -36,8 +36,8 @@ class IFacetDefinition(Interface):
                                                    u"appear as field title."))
     description = schema.ASCIILine(title=_(u"Description"), required=False)
     vocabularies = schema.Choice(
-            title=_(u"Vocabulary"), required=False,
-            description=_(u"Vocabulary to use to render facet items"),
+            title=_(u"Type/Vocabulary"),
+            description=_(u"Choose 'Free Text' for text field, 'Tags' for keywords field, or the rest of vocabulary to use to render facet items"),
             vocabulary="collective.facets.vocabularies.PortalVocabularies")
 
 

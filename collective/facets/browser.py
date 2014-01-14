@@ -96,7 +96,7 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             field.title = u'%s' % facet.name
             field.description = u''
             if facet.description:
-                field.description = facet.description
+                field.description = u'' + facet.description
             field.group = u'Metadata'
             field.sortable = True
             field.enabled = True
