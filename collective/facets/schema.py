@@ -25,6 +25,9 @@ class ExtensionKeywordField(ExtensionField, atapi.LinesField):
     def Vocabulary(self, content_instance=None):
         vocab_name = self.vocabulary
 
+        if not (isinstance(vocab_name, basestring) and vocab_name):
+            return atapi.DisplayList()
+
         pv = getToolByName(content_instance, 'portal_vocabularies', None)
         vocab = getattr(pv, vocab_name, None)
         if vocab:

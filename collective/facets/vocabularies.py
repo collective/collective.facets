@@ -58,7 +58,6 @@ class PortalVocabulariesVocabulary(object):
                     if factory[0] not in atvocabulary_ids])
 
         res.sort(key=operator.itemgetter(1), cmp=compare)
-        res.insert(0, ('', ''))
         items = [SimpleTerm(key, key, value) for key, value in res]
         return SimpleVocabulary(items)
 
