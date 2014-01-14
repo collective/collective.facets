@@ -59,7 +59,7 @@ class PortalVocabulariesVocabulary(object):
 
         res.sort(key=operator.itemgetter(1), cmp=compare)
         res.insert(0, ('FieldType:KeywordField', 'Tags'))
-        res.insert(0, ('FieldType:free_text', 'Free Text'))
+        res.insert(0, ('FieldType:StringField', 'Free Text'))
         items = [SimpleTerm(key, key, value) for key, value in res]
         return SimpleVocabulary(items)
 

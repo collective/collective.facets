@@ -31,7 +31,7 @@ class ExtensionKeywordField(ExtensionField, atapi.LinesField):
         if not (isinstance(vocab_name, basestring) and vocab_name):
             return atapi.DisplayList()
 
-        if vocab_name == 'tags':
+        if vocab_name == 'FieldType:KeywordField':
             return atapi.DisplayList()
 
         pv = getToolByName(content_instance, 'portal_vocabularies', None)
@@ -78,7 +78,7 @@ class FacetsExtender(object):
             field_name = facetId(facet.name)
             vocabularies = facet.vocabularies
 
-            if vocabularies == 'free_text':
+            if vocabularies == 'FieldType:StringField':
 
                 self.fields.append(
                     ExtensionStringField(field_name,
@@ -88,7 +88,7 @@ class FacetsExtender(object):
                                            label=facet.display_title,
                                            description=facet.description
                                        )))
-            elif vocabularies == 'tags' or not vocabularies:
+            elif vocabularies == 'FieldType:KeywordField' or not vocabularies:
                 self.fields.append(
                     ExtensionKeywordField(field_name,
                                           schemata="categorization",
