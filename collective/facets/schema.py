@@ -1,7 +1,7 @@
 from zope.component import adapts
 from zope.interface import implements
 
-from Products.Archetypes.public import KeywordWidget, InAndOutWidget
+from Products.Archetypes.public import KeywordWidget, InAndOutWidget, StringWidget
 from Products.Archetypes import public as atapi
 from Products.Archetypes.interfaces import IBaseContent
 
@@ -18,6 +18,9 @@ from zope.schema.interfaces import IVocabularyFactory
 from zope.component import queryUtility
 from zope.component.interfaces import ComponentLookupError
 
+class ExtensionStringField(ExtensionField, atapi.StringField):
+    """ facets TextField
+    """
 
 class ExtensionKeywordField(ExtensionField, atapi.LinesField):
     """ Retrofitted keyword field """
@@ -76,8 +79,16 @@ class FacetsExtender(object):
             vocabularies = facet.vocabularies
 
             if vocabularies == 'free_text':
-                self.fields.append(atapi.TextField(field_name))
-            elif vocabularies == 'tags':
+
+                self.fields.append(
+                    ExtensionStringField(field_name,
+                                       schemata="categorization",
+                                       searchable=True,
+                                       widget=StringWidget(
+                                           label=facet.display_title,
+                                           description=facet.description
+                                       )))
+            elif vocabularies == 'tags' or not vocabularies:
                 self.fields.append(
                     ExtensionKeywordField(field_name,
                                           schemata="categorization",

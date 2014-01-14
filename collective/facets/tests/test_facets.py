@@ -57,7 +57,7 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.request.set('ACTUAL_URL', self.collection.absolute_url())
 
 
-    def add_facet(self, index, name, title, desc=''):
+    def add_facet(self, index, name, title, desc='', _type='free_text'):
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
 
         self.browser.getControl(name='__ac_name').value = TEST_USER_NAME
@@ -84,40 +84,45 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
 
 
-    def test_add_content(self):
-        self.add_facet(0, 'facet1', 'My Facet')
+    def test_add_stringfield(self):
+        self.add_facet(0, 'facet1', 'My Facet', _type="free_text")
 
         #check it adds a field to any content
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.browser.getControl(name="facet_MyFacet_keywords:lines").value="myvalue"
+        page = self.browser.contents
+        self.assertIn('data-fieldname="facet_facet1"', page)
+        self.browser.getControl(name="facet_facet1").value="myvalue"
         self.browser.getControl("Save")
 
         # check we can search
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.assertTrue('facet_MyFacet' in self.browser.getControl(name="addindex").options)
+        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
         #self.browser.getControl("MyFacet").select()
         #self.browser.getControl('Is').select()
         #self.browser.getControl('myvalue').select()
 
         # check we can show as metadata
-        self.assertTrue('facet_MyFacet' in self.browser.getControl(name="customViewFields_options").options)
+        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
 
+
+    def test_remove_facet(self):
+        self.add_facet(0, 'facet1', 'My Facet', _type="free_text")
 
         # now delete our facet
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
-        self.browser.getControl(name="form.widgets.facets.0.remove").selected = True
+        self.browser.getControl(name="form.widgets.facets.0.remove").value = True
         self.browser.getControl('Save').click()
 
         #check it removed the field from content
         self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.assertFalse('MyFacet' in self.browser.getControl(name="addindex").options)
+        page = self.browser.contents
+        self.assertNotIn('data-fieldname="facet_facet1"', page)
 
+        # no longer an catalog index
+        self.assertNotIn('facet_facet1', self.browser.getControl(name="addindex").options)
 
-
-
-#        view = self.collection.restrictedTraverse('@@view')
-#        self.assertTrue(view())
-#        self.assertEquals(view.request.response.status, 200)
+        # no longer metadata
+        self.assertNotIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
 
 
 
