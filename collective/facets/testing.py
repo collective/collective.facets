@@ -8,18 +8,26 @@ from plone.app.testing.layers import FunctionalTesting
 from plone.app.testing.layers import IntegrationTesting
 import collective.facets
 
+try:
+    import plone.app.collection
+    PLONE43 = True
+except:
+    PLONE43 = False
+
+
 
 class PloneAppCollectionLayer(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
-        import plone.app.collection
-        xmlconfig.file('configure.zcml', plone.app.collection,
-                       context=configurationContext)
+        if PLONE43:
+            xmlconfig.file('configure.zcml', plone.app.collection,
+                           context=configurationContext)
         xmlconfig.file('configure.zcml', collective.facets,
                        context=configurationContext)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'plone.app.collection:default')
+        if PLONE43:
+            applyProfile(portal, 'plone.app.collection:default')
         applyProfile(portal, 'collective.facets:default')
 
 

@@ -6,7 +6,8 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="collective.facets">
 
-    <five:registerPackage package="." initialize=".initialize" />
+
+    <include package="Products.CMFCore" file="permissions.zcml" />
 
     <genericsetup:registerProfile
             name="default"

@@ -14,7 +14,7 @@ from collective.facets.testing import \
 
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD, setRoles, login
 
-from plone.app.collection.interfaces import ICollection
+#from plone.app.collection.interfaces import ICollection
 from plone.testing.z2 import Browser
 
 
@@ -56,18 +56,36 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.request.set('URL', self.collection.absolute_url())
         self.request.set('ACTUAL_URL', self.collection.absolute_url())
 
-    def test_addfacet(self):
+
+    def add_facet(self, index, name, title, desc=''):
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
 
         self.browser.getControl(name='__ac_name').value = TEST_USER_NAME
         self.browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
         self.browser.getControl(name='submit').click()
 
-        # add a facet 
+        # add a facet
         self.browser.getControl("Add").click()
-        self.browser.getControl(name='form.widgets.facets.0.widgets.name').value="My Facet"
-        self.browser.getControl(name='form.widgets.facets.0.widgets.description').value="My Description"
+        prefix = 'form.widgets.facets.%s.widgets'%index
+        self.browser.getControl(name='%s.name'%prefix).value=name
+        self.browser.getControl(name='%s.display_title'%prefix).value=title
+        self.browser.getControl(name='%s.description'%prefix).value=desc
         self.browser.getControl('Save').click()
+
+    def test_add_facet(self):
+
+        self.add_facet(0, 'myfacet', 'My Facet', 'My Description')
+
+        # make sure it saved right
+
+        self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
+        self.assertIn('My Facet', self.browser.contents)
+        self.assertIn('My Description', self.browser.contents)
+
+
+
+    def test_add_content(self):
+        self.add_facet(0, 'facet1', 'My Facet')
 
         #check it adds a field to any content
         self.browser.open( self.collection.absolute_url()+'/edit' )
