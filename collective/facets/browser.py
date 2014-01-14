@@ -94,7 +94,10 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         if collections:
             field = collections.setdefault(id)
             field.title = u"%s" % facet.name
-            field.description = u"" + facet.description
+            if facet.description:
+                field.description = u"" + facet.description
+            else:
+                field.description = u""
             field.group = u'Metadata'
             field.sortable = True
             field.enabled = True

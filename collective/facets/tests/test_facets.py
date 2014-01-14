@@ -9,10 +9,10 @@ from zope.component import queryUtility
 
 from collective.facets.testing import \
     PLONEAPPCOLLECTION_INTEGRATION_TESTING
-from collective.facets.testing import \
-    PLONEAPPCOLLECTION_FUNCTIONAL_TESTING
+from collective.facets.testing import PLONEAPPCOLLECTION_FUNCTIONAL_TESTING
 
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD, setRoles, login
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, \
+    TEST_USER_PASSWORD, setRoles, login
 
 #from plone.app.collection.interfaces import ICollection
 from plone.testing.z2 import Browser

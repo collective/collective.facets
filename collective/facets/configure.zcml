@@ -29,13 +29,6 @@
             class=".browser.FacetsSettingsControlPanel"
             permission="cmf.ManagePortal" />
 
-    <browser:page
-            for="*"
-            name="field_switcher"
-            class=".browser.FieldSwitcher"
-            attribute="run_task"
-            permission="cmf.ManagePortal" />
-
     <utility component=".vocabularies.PortalVocabulariesVocabularyFactory"
              name="collective.facets.vocabularies.PortalVocabularies" />
 
