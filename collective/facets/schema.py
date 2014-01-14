@@ -25,6 +25,12 @@ class ExtensionKeywordField(ExtensionField, atapi.LinesField):
     def Vocabulary(self, content_instance=None):
         vocab_name = self.vocabulary
 
+        if not (isinstance(vocab_name, basestring) and vocab_name):
+            return atapi.DisplayList()
+
+        if vocab_name == 'tags':
+            return atapi.DisplayList()
+
         pv = getToolByName(content_instance, 'portal_vocabularies', None)
         vocab = getattr(pv, vocab_name, None)
         if vocab:
@@ -69,11 +75,20 @@ class FacetsExtender(object):
             field_name = facetId(facet.name)
             vocabularies = facet.vocabularies
 
-            if vocabularies:
-                #import ipdb; ipdb.set_trace()
-                #display_list = atapi.DisplayList(
-                #    [(x, x) for x in ['this', 'is', 'a', 'dummy',
-                #                      'vocabulary']])
+            if vocabularies == 'free_text':
+                self.fields.append(atapi.TextField(field_name))
+            elif vocabularies == 'tags':
+                self.fields.append(
+                    ExtensionKeywordField(field_name,
+                                          schemata="categorization",
+                                          multiValued=1,
+                                          accessor=field_name,
+                                          searchable=True,
+                                          widget=KeywordWidget(
+                                              label=facet.display_title,
+                                              description=facet.description))
+                )
+            else:
                 self.fields.append(
                     ExtensionKeywordField(field_name,
                                           schemata="categorization",
@@ -85,17 +100,8 @@ class FacetsExtender(object):
                                               description=facet.description),
                                           vocabulary=vocabularies)
                 )
-            else:
-                self.fields.append(
-                    ExtensionKeywordField(field_name,
-                                          schemata="categorization",
-                                          multiValued=1,
-                                          accessor=field_name,
-                                          searchable=True,
-                                          widget=KeywordWidget(
-                                              label=facet.display_title,
-                                              description=facet.description))
-                )
+
+
 
         # build up our fields list from the registery settings
         #self.defaultRereviewDaysWait = settings.defaultRereviewDaysWait
