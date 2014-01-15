@@ -57,7 +57,7 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.request.set('ACTUAL_URL', self.collection.absolute_url())
 
 
-    def add_facet(self, index, name, title, desc='', _type='free_text'):
+    def add_facet(self, index, name, title, desc='', _type='FieldType:StringField'):
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
 
         self.browser.getControl(name='__ac_name').value = TEST_USER_NAME
@@ -85,7 +85,7 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
 
     def test_add_stringfield(self):
-        self.add_facet(0, 'facet1', 'My Facet', _type="free_text")
+        self.add_facet(0, 'facet1', 'My Facet', _type="FieldType:StringField")
 
         #check it adds a field to any content
         self.browser.open( self.collection.absolute_url()+'/edit' )
@@ -106,11 +106,12 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
 
     def test_remove_facet(self):
-        self.add_facet(0, 'facet1', 'My Facet', _type="free_text")
+        self.add_facet(0, 'facet1', 'My Facet', _type="FieldType:StringField")
 
         # now delete our facet
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
         self.browser.getControl(name="form.widgets.facets.0.remove").value = True
+        self.browser.getControl('Remove selected').click()
         self.browser.getControl('Save').click()
 
         #check it removed the field from content
