@@ -69,7 +69,7 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.browser.getControl(name='%s.name'%prefix).value=name
         self.browser.getControl(name='%s.display_title'%prefix).value=title
         self.browser.getControl(name='%s.description'%prefix).value=desc
-        self.browser.getControl(name='%s.vocabularies:list'%prefix).value=_type
+        self.browser.getControl(name='%s.vocabularies:list'%prefix).value=[_type]
         self.browser.getControl('Save').click()
 
     def test_add_facet(self):
