@@ -102,6 +102,47 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         # check we can show as metadata
         self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
 
+    def test_add_keywordfield(self):
+        self.add_facet(0, 'facet1', 'My Facet', _type='FieldType:KeywordField')
+
+        #check it adds a field to any content
+        self.browser.open( self.collection.absolute_url()+'/edit' )
+        page = self.browser.contents
+        self.assertIn('data-fieldname="facet_facet1"', page)
+        self.browser.getControl(name="facet_facet1_keywords:lines").value="myvalue\nyourvalue"
+        self.browser.getControl("Save")
+
+        # check we can search
+        self.browser.open( self.collection.absolute_url()+'/edit' )
+        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
+        #self.browser.getControl("MyFacet").select()
+        #self.browser.getControl('Is').select()
+        #self.browser.getControl('myvalue').select()
+
+        # check we can show as metadata
+        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
+
+    def test_add_vocabularyfield(self):
+        self.add_facet(0, 'facet1', 'My Facet', _type='plone.app.vocabularies.Skins')
+
+        #check it adds a field to any content
+        self.browser.open( self.collection.absolute_url()+'/edit' )
+        page = self.browser.contents
+        self.assertIn('data-fieldname="facet_facet1"', page)
+        # TODO: need to fix this, the value is not right.
+        #self.browser.getControl(name="facet_facet1:list").value=["Plone Default"]
+        self.browser.getControl("Save")
+
+        # check we can search
+        self.browser.open( self.collection.absolute_url()+'/edit' )
+        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
+        #self.browser.getControl("MyFacet").select()
+        #self.browser.getControl('Is').select()
+        #self.browser.getControl('myvalue').select()
+
+        # check we can show as metadata
+        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
+
     def test_remove_facet(self):
         self.add_facet(0, 'facet1', 'My Facet')
 
