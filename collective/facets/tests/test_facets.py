@@ -56,7 +56,6 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.request.set('URL', self.collection.absolute_url())
         self.request.set('ACTUAL_URL', self.collection.absolute_url())
 
-
     def add_facet(self, index, name, title, desc='', _type='FieldType:StringField'):
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
 
@@ -70,6 +69,7 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.browser.getControl(name='%s.name'%prefix).value=name
         self.browser.getControl(name='%s.display_title'%prefix).value=title
         self.browser.getControl(name='%s.description'%prefix).value=desc
+        self.browser.getControl(name='%s.vocabularies:list'%prefix).value=_type
         self.browser.getControl('Save').click()
 
     def test_add_facet(self):
@@ -82,10 +82,8 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.assertIn('My Facet', self.browser.contents)
         self.assertIn('My Description', self.browser.contents)
 
-
-
     def test_add_stringfield(self):
-        self.add_facet(0, 'facet1', 'My Facet', _type="FieldType:StringField")
+        self.add_facet(0, 'facet1', 'My Facet')
 
         #check it adds a field to any content
         self.browser.open( self.collection.absolute_url()+'/edit' )
@@ -104,9 +102,8 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         # check we can show as metadata
         self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
 
-
     def test_remove_facet(self):
-        self.add_facet(0, 'facet1', 'My Facet', _type="FieldType:StringField")
+        self.add_facet(0, 'facet1', 'My Facet')
 
         # now delete our facet
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
