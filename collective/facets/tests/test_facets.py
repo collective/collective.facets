@@ -18,11 +18,6 @@ from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, \
 from plone.testing.z2 import Browser
 
 
-query = [{
-    'i': 'Title',
-    'o': 'plone.app.querystring.operation.string.is',
-    'v': 'Collection Test Page',
-}]
 
 #query = [{
 #    'i': 'SearchableText',
@@ -41,8 +36,14 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         login(self.portal, TEST_USER_NAME)
         self.portal.invokeFactory('Folder', 'test-folder')
         self.folder = self.portal['test-folder']
+
+        self.folder.invokeFactory('Document', 'test-page')
+        self.page = self.folder['test-page']
+        self.page.setTitle('My Page')
+
         self.folder.invokeFactory('Collection',
-                                  'collection1')
+                                  'collection1',
+                                  'My Collection')
         self.collection = aq_inner(self.folder['collection1'])
 
         # Commit so that the test browser sees these changes
@@ -55,6 +56,9 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
         self.request.set('URL', self.collection.absolute_url())
         self.request.set('ACTUAL_URL', self.collection.absolute_url())
+
+
+
 
     def add_facet(self, index, name, title, desc='', _type='FieldType:StringField'):
         self.browser.open(self.portal.absolute_url()+'/@@facets-settings')
@@ -72,6 +76,28 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.browser.getControl(name='%s.vocabularies:list'%prefix).value=[_type]
         self.browser.getControl('Save').click()
 
+    def set_collection(self, facet_name, value):
+
+        query = [{
+            'i': facet_name,
+            'o': 'plone.app.querystring.operation.string.is',
+            'v': value,
+        }]
+
+        self.collection.setQuery(query)
+        self.assertEqual(len(self.collection.results()), 1)
+
+
+#        self.browser.open( self.collection.absolute_url()+'/edit' )
+#        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
+        #self.browser.getControl("MyFacet").select()
+        #self.browser.getControl('Is').select()
+        #self.browser.getControl('myvalue').select()
+
+        # check we can show as metadata
+#        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
+
+
     def test_add_facet(self):
 
         self.add_facet(0, 'myfacet', 'My Facet', 'My Description')
@@ -85,42 +111,34 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
     def test_add_stringfield(self):
         self.add_facet(0, 'facet1', 'My Facet')
 
-        #check it adds a field to any content
-        self.browser.open( self.collection.absolute_url()+'/edit' )
+        #check it adds a field to a page
+        self.browser.open( self.page.absolute_url()+'/edit' )
         page = self.browser.contents
         self.assertIn('data-fieldname="facet_facet1"', page)
         self.browser.getControl(name="facet_facet1").value="myvalue"
         self.browser.getControl("Save")
+        print self.browser.contents
 
-        # check we can search
-        self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
-        #self.browser.getControl("MyFacet").select()
-        #self.browser.getControl('Is').select()
-        #self.browser.getControl('myvalue').select()
+        # check we can search and show metadata
+        self.set_collection('facet_facet1', 'myvalue')
 
-        # check we can show as metadata
-        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
+        self.browser.open( self.collection.absolute_url()+'/view' )
+        self.assertIn('myvalue', self.browser.contents)
+
 
     def test_add_keywordfield(self):
         self.add_facet(0, 'facet1', 'My Facet', _type='FieldType:KeywordField')
 
         #check it adds a field to any content
-        self.browser.open( self.collection.absolute_url()+'/edit' )
+        self.browser.open( self.page.absolute_url()+'/edit' )
         page = self.browser.contents
         self.assertIn('data-fieldname="facet_facet1"', page)
         self.browser.getControl(name="facet_facet1_keywords:lines").value="myvalue\nyourvalue"
         self.browser.getControl("Save")
 
-        # check we can search
-        self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
-        #self.browser.getControl("MyFacet").select()
-        #self.browser.getControl('Is').select()
-        #self.browser.getControl('myvalue').select()
+        # check we can search and show metadata
+#        self.set_collection('facet_facet1', 'myvalue')
 
-        # check we can show as metadata
-        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
 
     def test_add_vocabularyfield(self):
         self.add_facet(0, 'facet1', 'My Facet', _type='plone.app.vocabularies.Skins')
@@ -133,16 +151,6 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         #self.browser.getControl(name="facet_facet1:list").value=["Plone Default"]
         self.browser.getControl("Save")
 
-        # check we can search
-        self.browser.open( self.collection.absolute_url()+'/edit' )
-        self.assertTrue('facet_facet1' in self.browser.getControl(name="addindex").options)
-        #self.browser.getControl("MyFacet").select()
-        #self.browser.getControl('Is').select()
-        #self.browser.getControl('myvalue').select()
-
-        # check we can show as metadata
-        self.assertIn('facet_facet1', self.browser.getControl(name="customViewFields_options").options)
-
     def test_remove_facet(self):
         self.add_facet(0, 'facet1', 'My Facet')
 
@@ -153,10 +161,11 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
         self.browser.getControl('Save').click()
 
         #check it removed the field from content
-        self.browser.open( self.collection.absolute_url()+'/edit' )
+        self.browser.open( self.page.absolute_url()+'/edit' )
         page = self.browser.contents
         self.assertNotIn('data-fieldname="facet_facet1"', page)
 
+        self.browser.open( self.collection.absolute_url()+'/edit' )
         # no longer an catalog index
         self.assertNotIn('facet_facet1', self.browser.getControl(name="addindex").options)
 
