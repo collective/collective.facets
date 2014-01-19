@@ -1,3 +1,9 @@
+.. contents::
+
+.. image:: https://secure.travis-ci.org/collective/collective.facets.png
+    :target: http://travis-ci.org/collective/collective.facets
+
+
 Introduction
 ============
 
@@ -33,6 +39,7 @@ Currently only works with in Plone 4.2 with new style collections and Archetypes
 
 Future Functionality
 ====================
+
  - Rename a facet without losing values (#TODO)
  - Make a facet required (#TODO)
  - Make a facet have an enforced vocabulary, perhaps via ATVocabularyManager (#TODO)
