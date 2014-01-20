@@ -25,6 +25,7 @@ setup(name='collective.facets',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'Products.CMFPlone',
           'archetypes.schemaextender',
           'plone.app.registry'
           # -*- Extra requirements: -*-
