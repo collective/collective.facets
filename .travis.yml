@@ -19,5 +19,5 @@ before_install:
   - sudo apt-get install -qq libxml2-dev libxslt-dev
 install:
   - python bootstrap.py -c travis-$PLONE.cfg
-  - bin/buildout -t 3 -c travis-$PLONE.cfg -q
+  - bin/buildout -t 3 -c travis-$PLONE.cfg
 script: bin/test
