@@ -97,6 +97,8 @@ class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
 
             self.collection.setQuery(query)
             self.assertEqual(len(self.collection.results()), 1)
+            self.collection.setCustomViewFields([facet_name, 'Title'])
+            self.collection.setLayout('tabular_view')
         else:
             topic = self.collection
             topic.addCriterion( facet_name, 'ATSimpleStringCriterion' )
