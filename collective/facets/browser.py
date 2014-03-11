@@ -93,20 +93,36 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         collections = self.getCollectionMap()
         if collections:
             field = collections.setdefault(id)
-            field.title = u'%s' % facet.name
+            field.title = u'%s' % facet.display_title
             field.description = u''
             if facet.description:
                 field.description = u'' + facet.description
             field.group = u'Metadata'
             field.sortable = True
             field.enabled = True
-            field.vocabulary = u'plone.app.vocabularies.Keywords'
-            field.operations = ['plone.app.querystring.operation.selection.is']
+            if facet.vocabulary == 'FieldType:StringField':
+                field.vocabulary = None
+                field.operations = ['plone.app.querystring.operation.string.contains',
+                                     'plone.app.querystring.operation.string.is']
+            elif facet.vocabulary == 'FieldType:KeywordField':
+                field.vocabulary = u'plone.app.vocabularies.Keywords'
+                field.operations = ['plone.app.querystring.operation.selection.is']
+            else:
+                field.vocabulary = unicode(field.vocabulary)
+                field.operations = ['plone.app.querystring.operation.selection.is']
+
 
         # old collections
-        atct = getToolByName(self.context, 'portal_atct')
-        atct.addIndex(id, facet.name, facet.description, enabled=True)
-        atct.addMetadata(id, facet.name, facet.description, enabled=True)
+        try:
+            atct = getToolByName(self.context, 'portal_atct')
+        except:
+            atct = None
+        if atct is not None:
+            #criteria ??
+            #from Products.ATContentTypes.criteria.selection import ATSelectionCriterion
+            #from Products.ATContentTypes.criteria.simplestring import ATSimpleStringCriterion
+            atct.addIndex(id, facet.display_title, facet.description, enabled=True)
+            atct.addMetadata(id, facet.display_title, facet.description, enabled=True)
 
         # catalog metadata
         if id not in self.catalog.schema():
@@ -114,7 +130,10 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
 
         # catalog indexes
         if id not in self.catalog.indexes():
-            self.catalog.addIndex(id, 'KeywordIndex')
+            if facet.vocabulary == 'FieldType:StringField':
+                self.catalog.addIndex(id, 'FieldIndex')
+            else:
+                self.catalog.addIndex(id, 'KeywordIndex')
             return [id]
         else:
             return []
