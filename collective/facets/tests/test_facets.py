@@ -28,7 +28,7 @@ except:
 #    'v': 'Autoren'
 #}]
 
-class PloneAppCollectionViewsIntegrationTest(unittest.TestCase):
+class FacetsIntegrationTest(unittest.TestCase):
 
     layer = PLONEAPPCOLLECTION_FUNCTIONAL_TESTING
 

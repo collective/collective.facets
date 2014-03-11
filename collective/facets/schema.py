@@ -78,7 +78,7 @@ class FacetsExtender(object):
             field_name = facetId(facet.name)
             vocabularies = facet.vocabularies
 
-            if vocabularies == 'FieldType:StringField':
+            if vocabularies in ['FieldType:StringField', 'free_text']:
 
                 self.fields.append(
                     ExtensionStringField(field_name,
@@ -88,7 +88,7 @@ class FacetsExtender(object):
                                            label=facet.display_title,
                                            description=facet.description
                                        )))
-            elif vocabularies == 'FieldType:KeywordField' or not vocabularies:
+            elif vocabularies in ['FieldType:KeywordField', 'tags'] or not vocabularies:
                 self.fields.append(
                     ExtensionKeywordField(field_name,
                                           schemata="categorization",

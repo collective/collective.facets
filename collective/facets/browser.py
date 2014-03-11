@@ -100,11 +100,11 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             field.group = u'Metadata'
             field.sortable = True
             field.enabled = True
-            if facet.vocabulary == 'FieldType:StringField':
+            if facet.vocabulary in ['FieldType:StringField', 'free_text']:
                 field.vocabulary = None
                 field.operations = ['plone.app.querystring.operation.string.contains',
                                      'plone.app.querystring.operation.string.is']
-            elif facet.vocabulary == 'FieldType:KeywordField':
+            elif facet.vocabulary in ['FieldType:KeywordField', 'tags']:
                 field.vocabulary = u'plone.app.vocabularies.Keywords'
                 field.operations = ['plone.app.querystring.operation.selection.is']
             else:
@@ -130,7 +130,7 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
 
         # catalog indexes
         if id not in self.catalog.indexes():
-            if facet.vocabulary == 'FieldType:StringField':
+            if facet.vocabulary in ['FieldType:StringField', 'free_text']:
                 self.catalog.addIndex(id, 'FieldIndex')
             else:
                 self.catalog.addIndex(id, 'KeywordIndex')
