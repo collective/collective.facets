@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2 (unreleased)
+1.2 (2013-03-12)
 ----------------
 - make string field work with collections
     [djay]
