@@ -100,11 +100,11 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
             field.group = u'Metadata'
             field.sortable = True
             field.enabled = True
-            if facet.vocabulary in ['FieldType:StringField', 'free_text']:
+            if facet.vocabularies in ['FieldType:StringField', 'free_text']:
                 field.vocabulary = None
                 field.operations = ['plone.app.querystring.operation.string.contains',
                                      'plone.app.querystring.operation.string.is']
-            elif facet.vocabulary in ['FieldType:KeywordField', 'tags']:
+            elif facet.vocabularies in ['FieldType:KeywordField', 'tags']:
                 field.vocabulary = u'plone.app.vocabularies.Keywords'
                 field.operations = ['plone.app.querystring.operation.selection.is']
             else:
@@ -130,7 +130,7 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
 
         # catalog indexes
         if id not in self.catalog.indexes():
-            if facet.vocabulary in ['FieldType:StringField', 'free_text']:
+            if facet.vocabularies in ['FieldType:StringField', 'free_text']:
                 self.catalog.addIndex(id, 'FieldIndex')
             else:
                 self.catalog.addIndex(id, 'KeywordIndex')
@@ -145,10 +145,18 @@ class FacetSettingsEditForm (controlpanel.RegistryEditForm):
         if collections and id in collections:
             del collections[id]
 
+        # new collections
+        collections = self.getCollectionMap()
+        if collections:
+            if id in collections:
+                del collections[id]
+
         # old collections
         atct = getToolByName(self.context, 'portal_atct')
         atct.removeIndex(id)
         atct.removeMetadata(id)
+
+
 
         if id in self.catalog.indexes():
             self.catalog.delIndex(id)
